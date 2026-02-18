@@ -1113,7 +1113,6 @@ class GameCoordinator {
     this.gameUi = document.getElementById('game-ui');
     this.rowTop = document.getElementById('row-top');
     this.mazeDiv = document.getElementById('maze');
-    this.mazeImg = document.getElementById('maze-img');
     this.mazeCover = document.getElementById('maze-cover');
     this.pointsDisplay = document.getElementById('points-display');
     this.highScoreDisplay = document.getElementById('high-score-display');
@@ -1129,19 +1128,29 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // Hide static image, we will draw dynamic walls
-    this.mazeImg.style.display = 'none';
-    
-    // Create Canvas for Dynamic Walls
+    // --- FIX 1: REMOVE STATIC IMAGE COMPLETELY ---
+    const oldImg = document.getElementById('maze-img');
+    if (oldImg) { oldImg.remove(); }
+
+    // --- FIX 2: CREATE DYNAMIC CANVAS ---
     this.mazeCanvas = document.createElement('canvas');
     this.mazeCanvas.id = 'maze-canvas';
     this.mazeCanvas.style.position = 'absolute';
     this.mazeCanvas.style.top = '0';
     this.mazeCanvas.style.left = '0';
-    this.mazeCanvas.style.zIndex = '0'; // Behind dots
+    this.mazeCanvas.style.zIndex = '1'; // Floor level
     this.mazeDiv.appendChild(this.mazeCanvas);
 
-    // LEVEL 1: The Classic
+    // Ensure Dot Container is ABOVE walls
+    this.dotContainer = document.getElementById('dot-container');
+    if (!this.dotContainer) {
+        this.dotContainer = document.createElement('div');
+        this.dotContainer.id = 'dot-container';
+        this.mazeDiv.appendChild(this.dotContainer);
+    }
+    this.dotContainer.style.zIndex = '10'; // Dots above walls
+
+    // MAP 1: The Classic (Blue Walls)
     const map1 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -1176,14 +1185,14 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // LEVEL 2: The Grid (More open, different barriers)
+    // MAP 2: The Grid (Red Walls, More Open)
     const map2 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
       'XOXXXXoXXXXXoXXoXXXXXoXXXXOX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
-      'Xoooooooooooo  ooooooooooooX',
+      'Xoooooooooooo  ooooooooooooX', // Open Middle
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XooooooXXooooXXooooXXooooooX',
@@ -1211,7 +1220,7 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // LEVEL 3: The Cross (Very different layout)
+    // MAP 3: The Cross (Green Walls, Verticality)
     const map3 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -1253,7 +1262,7 @@ class GameCoordinator {
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
 
-    // Initialize Map 1
+    // Default to Map 1
     this.mazeArray = this.layouts[0].map(row => row.split(''));
 
     this.movementKeys = { 87: 'up', 83: 'down', 65: 'left', 68: 'right', 38: 'up', 40: 'down', 37: 'left', 39: 'right' };
@@ -1270,19 +1279,19 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // LEVEL DISPLAY SETUP (RIGHT ALIGNED)
+    // --- FIX 3: HUD Text Positioning (Right Aligned) ---
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
     this.levelDisplay.style.color = '#fff';
     this.levelDisplay.style.position = 'absolute';
     this.levelDisplay.style.bottom = '0';
-    this.levelDisplay.style.right = '0'; // Snap to right
-    this.levelDisplay.style.left = 'auto'; // Release left
+    this.levelDisplay.style.right = '0'; 
+    this.levelDisplay.style.left = 'auto'; 
     this.levelDisplay.style.textAlign = 'right';
     this.levelDisplay.style.lineHeight = `${this.scaledTileSize * 2}px`;
     this.levelDisplay.style.fontSize = `${this.scaledTileSize}px`;
-    this.levelDisplay.style.marginRight = '5px'; // Small padding
+    this.levelDisplay.style.marginRight = '10px';
     this.levelDisplay.style.pointerEvents = 'none';
     this.bottomRow.style.position = 'relative';
     this.bottomRow.appendChild(this.levelDisplay);
@@ -1304,43 +1313,31 @@ class GameCoordinator {
 
   setMazeByLevel(level) {
     const layoutIndex = (level - 1) % this.layouts.length;
-    // Deep copy the selected layout so we can modify it (eat dots) without breaking the original
     this.mazeArray = this.layouts[layoutIndex].map(row => row.split(''));
   }
 
-  // Draw the blue walls onto the canvas
-  drawMazeBackground() {
+  // --- DRAWING LOGIC (Dynamic Walls) ---
+  drawMazeBackground(level) {
+    const layoutIndex = (level - 1) % this.layouts.length;
+    let wallColor = '#1919A6'; // Default Blue
+    if (layoutIndex === 1) wallColor = '#A61919'; // Red for Map 2
+    if (layoutIndex === 2) wallColor = '#19A619'; // Green for Map 3
+
     this.mazeCanvas.width = this.scaledTileSize * 28;
     this.mazeCanvas.height = this.scaledTileSize * 31;
     const ctx = this.mazeCanvas.getContext('2d');
     
-    // Clear
     ctx.clearRect(0, 0, this.mazeCanvas.width, this.mazeCanvas.height);
-    
-    // Draw Blue Walls for every 'X'
-    ctx.fillStyle = '#1919A6'; // Wall Color
+    ctx.fillStyle = wallColor;
     
     this.mazeArray.forEach((row, y) => {
         row.forEach((val, x) => {
             if (val === 'X') {
-                // Draw a simple block for the wall
-                // To make it look a bit "retro", we can leave a small gap
-                ctx.fillRect(
-                    x * this.scaledTileSize, 
-                    y * this.scaledTileSize, 
-                    this.scaledTileSize, 
-                    this.scaledTileSize
-                );
-                
-                // Optional: Add inner black square to simulate "hollow" walls
+                ctx.fillRect(x * this.scaledTileSize, y * this.scaledTileSize, this.scaledTileSize, this.scaledTileSize);
+                // Hollow effect
                 ctx.fillStyle = '#000';
-                ctx.fillRect(
-                    x * this.scaledTileSize + 2, 
-                    y * this.scaledTileSize + 2, 
-                    this.scaledTileSize - 4, 
-                    this.scaledTileSize - 4
-                );
-                ctx.fillStyle = '#1919A6'; // Reset to blue
+                ctx.fillRect(x * this.scaledTileSize + 2, y * this.scaledTileSize + 2, this.scaledTileSize - 4, this.scaledTileSize - 4);
+                ctx.fillStyle = wallColor;
             }
         });
     });
@@ -1403,7 +1400,7 @@ class GameCoordinator {
         `${imgBase}pickups/pacdot.svg`, `${imgBase}pickups/powerPellet.svg`,
         `${imgBase}pickups/apple.svg`, `${imgBase}pickups/bell.svg`, `${imgBase}pickups/cherry.svg`, `${imgBase}pickups/galaxian.svg`, `${imgBase}pickups/key.svg`, `${imgBase}pickups/melon.svg`, `${imgBase}pickups/orange.svg`, `${imgBase}pickups/strawberry.svg`,
         `${imgBase}text/ready.svg`, `${imgBase}text/100.svg`, `${imgBase}text/200.svg`, `${imgBase}text/300.svg`, `${imgBase}text/400.svg`, `${imgBase}text/500.svg`, `${imgBase}text/700.svg`, `${imgBase}text/800.svg`, `${imgBase}text/1000.svg`, `${imgBase}text/1600.svg`, `${imgBase}text/2000.svg`, `${imgBase}text/3000.svg`, `${imgBase}text/5000.svg`,
-        `${imgBase}maze/maze_blue.svg`, 'app/style/graphics/extra_life.png',
+        'app/style/graphics/extra_life.png',
       ];
       const audioBase = 'app/style/audio/';
       const audioSources = [`${audioBase}game_start.mp3`, `${audioBase}pause.mp3`, `${audioBase}pause_beat.mp3`, `${audioBase}siren_1.mp3`, `${audioBase}siren_2.mp3`, `${audioBase}siren_3.mp3`, `${audioBase}power_up.mp3`, `${audioBase}extra_life.mp3`, `${audioBase}eyes.mp3`, `${audioBase}eat_ghost.mp3`, `${audioBase}death.mp3`, `${audioBase}fruit.mp3`, `${audioBase}dot_1.mp3`, `${audioBase}dot_2.mp3`];
@@ -1480,17 +1477,18 @@ class GameCoordinator {
     this.scaredGhosts = [];
     this.eyeGhosts = 0;
 
+    // Determine current level map
+    this.setMazeByLevel(this.level);
+
     if (this.firstGame) {
-      this.setMazeByLevel(this.level);
       this.drawMaze(this.mazeArray, this.entityList);
-      this.drawMazeBackground(); // DRAW THE WALLS
+      this.drawMazeBackground(this.level);
       this.soundManager = new SoundManager();
       this.setUiDimensions();
     } else {
-      this.setMazeByLevel(this.level);
       this.updateCharacterMazes();
       this.resetMazePickups();
-      this.drawMazeBackground(); // UPDATE THE WALLS
+      this.drawMazeBackground(this.level);
       this.pacman.reset();
       this.ghosts.forEach((ghost) => { ghost.reset(true); });
     }
@@ -1511,12 +1509,17 @@ class GameCoordinator {
   }
 
   drawMaze(mazeArray, entityList) {
-    this.pickups = [this.fruit];
+    this.pickups = [this.fruit]; // Reset pickups list
     this.mazeDiv.style.height = `${this.scaledTileSize * 31}px`;
     this.mazeDiv.style.width = `${this.scaledTileSize * 28}px`;
     this.gameUi.style.width = `${this.scaledTileSize * 28}px`;
     this.bottomRow.style.minHeight = `${this.scaledTileSize * 2}px`;
+    
+    // Ensure container exists and is on top
     this.dotContainer = document.getElementById('dot-container');
+    if (this.dotContainer) {
+        this.dotContainer.style.zIndex = '10';
+    }
 
     mazeArray.forEach((row, rowIndex) => {
       row.forEach((block, columnIndex) => {
@@ -1756,25 +1759,23 @@ class GameCoordinator {
     this.removeTimer({ detail: { timer: this.fruitTimer } }); this.removeTimer({ detail: { timer: this.ghostCycleTimer } });
     this.removeTimer({ detail: { timer: this.endIdleTimer } }); this.removeTimer({ detail: { timer: this.ghostFlashTimer } });
     
-    // Win Animation
     new Timer(() => {
       this.ghosts.forEach((ghost) => { const ghostRef = ghost; ghostRef.display = false; });
-      // Blink Effect (Using canvas clear instead of svg swap)
+      // Blink Effect (Using canvas clear)
       const blink = (count) => {
         if (count > 5) {
             this.mazeCover.style.visibility = 'visible';
             new Timer(() => {
                 this.mazeCover.style.visibility = 'hidden';
                 this.level += 1;
-                // UPDATE MAP LOGIC
+                // UPDATE MAP
                 this.setMazeByLevel(this.level);
-                // UPDATE HUD
                 this.levelDisplay.innerText = 'Level: ' + this.level;
                 this.allowKeyPresses = true;
                 this.updateCharacterMazes();
                 this.resetMazePickups();
-                // REDRAW WALLS FOR NEW LEVEL
-                this.drawMazeBackground();
+                // REDRAW WALLS (Pass Level for color change)
+                this.drawMazeBackground(this.level);
                 this.entityList.forEach((entity) => {
                     const entityRef = entity;
                     if (entityRef.level) { entityRef.level = this.level; }
