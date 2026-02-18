@@ -19,42 +19,117 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    this.mazeArray = [
-      ['XXXXXXXXXXXXXXXXXXXXXXXXXXXX'],
-      ['XooooooooooooXXooooooooooooX'],
-      ['XoXXXXoXXXXXoXXoXXXXXoXXXXoX'],
-      ['XOXXXXoXXXXXoXXoXXXXXoXXXXOX'],
-      ['XoXXXXoXXXXXoXXoXXXXXoXXXXoX'],
-      ['XooooooooooooooooooooooooooX'],
-      ['XoXXXXoXXoXXXXXXXXoXXoXXXXoX'],
-      ['XoXXXXoXXoXXXXXXXXoXXoXXXXoX'],
-      ['XooooooXXooooXXooooXXooooooX'],
-      ['XXXXXXoXXXXX XX XXXXXoXXXXXX'],
-      ['XXXXXXoXXXXX XX XXXXXoXXXXXX'],
-      ['XXXXXXoXX          XXoXXXXXX'],
-      ['XXXXXXoXX XXXXXXXX XXoXXXXXX'],
-      ['XXXXXXoXX X      X XXoXXXXXX'],
-      ['      o   X      X   o      '],
-      ['XXXXXXoXX X      X XXoXXXXXX'],
-      ['XXXXXXoXX XXXXXXXX XXoXXXXXX'],
-      ['XXXXXXoXX          XXoXXXXXX'],
-      ['XXXXXXoXX XXXXXXXX XXoXXXXXX'],
-      ['XXXXXXoXX XXXXXXXX XXoXXXXXX'],
-      ['XooooooooooooXXooooooooooooX'],
-      ['XoXXXXoXXXXXoXXoXXXXXoXXXXoX'],
-      ['XoXXXXoXXXXXoXXoXXXXXoXXXXoX'],
-      ['XOooXXooooooo  oooooooXXooOX'],
-      ['XXXoXXoXXoXXXXXXXXoXXoXXoXXX'],
-      ['XXXoXXoXXoXXXXXXXXoXXoXXoXXX'],
-      ['XooooooXXooooXXooooXXooooooX'],
-      ['XoXXXXXXXXXXoXXoXXXXXXXXXXoX'],
-      ['XoXXXXXXXXXXoXXoXXXXXXXXXXoX'],
-      ['XooooooooooooooooooooooooooX'],
-      ['XXXXXXXXXXXXXXXXXXXXXXXXXXXX'],
+    // MAP 1: The Classic
+    const map1 = [
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOXXXXoXXXXXoXXoXXXXXoXXXXOx',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      '      o   X      X   o      ',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooXXooooooo  oooooooXXooOx',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
+    // MAP 2: The Open Fields
+    const map2 = [
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooooooooooooooooooooooooOX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      '      o   X      X   o      ',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooooooooooooooooooooooooOX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoooXXooooooo  oooooooXXoooX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    ];
+
+    // MAP 3: The Labyrinth
+    const map3 = [
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooooooooooooooooooooooooOX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      '      o   X      X   o      ',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoooXXooooooo  oooooooXXoooX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XOoooooXXooooXXooooXXoooooOX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    ];
+
+    this.layouts = [map1, map2, map3];
     this.maxFps = 120;
     this.tileSize = 8;
+    
+    this.mazeArray = this.layouts[0].map(row => row.split(''));
+    
     this.scale = this.determineScale(1);
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
@@ -84,9 +159,6 @@ class GameCoordinator {
       8: 5000,
     };
 
-    this.mazeArray.forEach((row, rowIndex) => {
-      this.mazeArray[rowIndex] = row[0].split('');
-    });
 
     this.gameStartButton.addEventListener(
       'click',
@@ -106,28 +178,43 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
 
     head.appendChild(link);
+
+    // Setup Level Display
+    this.levelDisplay = document.createElement('div');
+    this.levelDisplay.id = 'level-display';
+    this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
+    this.levelDisplay.style.color = '#fff';
+    
+    // FIXED POSITIONING: Right aligned
+    this.levelDisplay.style.position = 'absolute';
+    this.levelDisplay.style.bottom = '0';
+    this.levelDisplay.style.right = '0'; // Move to right side
+    this.levelDisplay.style.left = 'auto'; // Disable left positioning
+    this.levelDisplay.style.textAlign = 'right';
+    
+    this.levelDisplay.style.lineHeight = `${this.scaledTileSize * 2}px`;
+    this.levelDisplay.style.fontSize = `${this.scaledTileSize}px`;
+    this.levelDisplay.style.pointerEvents = 'none';
+    
+    // Ensure bottomRow allows absolute positioning of children
+    this.bottomRow.style.position = 'relative';
+    this.bottomRow.appendChild(this.levelDisplay);
   }
 
-  /**
-   * Recursive method which determines the largest possible scale the game's graphics can use
-   * @param {Number} scale
-   */
   determineScale(scale) {
+    const viewport = (typeof window !== 'undefined') ? window : {};
     const availableScreenHeight = Math.min(
       document.documentElement.clientHeight,
-      window.innerHeight || 0,
+      viewport.innerHeight || 0,
     );
     const availableScreenWidth = Math.min(
       document.documentElement.clientWidth,
-      window.innerWidth || 0,
+      viewport.innerWidth || 0,
     );
     const scaledTileSize = this.tileSize * scale;
 
-    // The original Pac-Man game leaves 5 tiles of height (3 above, 2 below) surrounding the
-    // maze for the UI. See app\style\graphics\spriteSheets\references\mazeGridSystemReference.png
-    // for reference.
     const mazeTileHeight = this.mazeArray.length + 5;
-    const mazeTileWidth = this.mazeArray[0][0].split('').length;
+    const mazeTileWidth = this.mazeArray[0].length;
 
     if (
       scaledTileSize * mazeTileHeight < availableScreenHeight
@@ -139,9 +226,11 @@ class GameCoordinator {
     return scale - 1;
   }
 
-  /**
-   * Reveals the game underneath the loading covers and starts gameplay
-   */
+  setMazeByLevel(level) {
+    const layoutIndex = (level - 1) % this.layouts.length;
+    this.mazeArray = this.layouts[layoutIndex].map(row => row.split(''));
+  }
+
   startButtonClick() {
     this.leftCover.style.left = '-50%';
     this.rightCover.style.right = '-50%';
@@ -160,9 +249,6 @@ class GameCoordinator {
     this.startGameplay(true);
   }
 
-  /**
-   * Toggles the master volume for the soundManager, and saves the preference to storage
-   */
   soundButtonClick() {
     const newVolume = this.soundManager.masterVolume === 1 ? 0 : 1;
     this.soundManager.setMasterVolume(newVolume);
@@ -170,16 +256,10 @@ class GameCoordinator {
     this.setSoundButtonIcon(newVolume);
   }
 
-  /**
-   * Sets the icon for the sound button
-   */
   setSoundButtonIcon(newVolume) {
     this.soundButton.innerHTML = newVolume === 0 ? 'volume_off' : 'volume_up';
   }
 
-  /**
-   * Displays an error message in the event assets are unable to download
-   */
   displayErrorMessage() {
     const loadingContainer = document.getElementById('loading-container');
     const errorMessage = document.getElementById('error-message');
@@ -191,10 +271,6 @@ class GameCoordinator {
     }, 1500);
   }
 
-  /**
-   * Load all assets into a hidden Div to pre-load them into memory.
-   * There is probably a better way to read all of these file names.
-   */
   preloadAssets() {
     return new Promise((resolve) => {
       const loadingContainer = document.getElementById('loading-container');
@@ -203,7 +279,6 @@ class GameCoordinator {
 
       const imgBase = 'app/style/graphics/spriteSheets/';
       const imgSources = [
-        // Pacman
         `${imgBase}characters/pacman/arrow_down.svg`,
         `${imgBase}characters/pacman/arrow_left.svg`,
         `${imgBase}characters/pacman/arrow_right.svg`,
@@ -214,8 +289,6 @@ class GameCoordinator {
         `${imgBase}characters/pacman/pacman_left.svg`,
         `${imgBase}characters/pacman/pacman_right.svg`,
         `${imgBase}characters/pacman/pacman_up.svg`,
-
-        // Blinky
         `${imgBase}characters/ghosts/blinky/blinky_down_angry.svg`,
         `${imgBase}characters/ghosts/blinky/blinky_down_annoyed.svg`,
         `${imgBase}characters/ghosts/blinky/blinky_down.svg`,
@@ -228,38 +301,26 @@ class GameCoordinator {
         `${imgBase}characters/ghosts/blinky/blinky_up_angry.svg`,
         `${imgBase}characters/ghosts/blinky/blinky_up_annoyed.svg`,
         `${imgBase}characters/ghosts/blinky/blinky_up.svg`,
-
-        // Clyde
         `${imgBase}characters/ghosts/clyde/clyde_down.svg`,
         `${imgBase}characters/ghosts/clyde/clyde_left.svg`,
         `${imgBase}characters/ghosts/clyde/clyde_right.svg`,
         `${imgBase}characters/ghosts/clyde/clyde_up.svg`,
-
-        // Inky
         `${imgBase}characters/ghosts/inky/inky_down.svg`,
         `${imgBase}characters/ghosts/inky/inky_left.svg`,
         `${imgBase}characters/ghosts/inky/inky_right.svg`,
         `${imgBase}characters/ghosts/inky/inky_up.svg`,
-
-        // Pinky
         `${imgBase}characters/ghosts/pinky/pinky_down.svg`,
         `${imgBase}characters/ghosts/pinky/pinky_left.svg`,
         `${imgBase}characters/ghosts/pinky/pinky_right.svg`,
         `${imgBase}characters/ghosts/pinky/pinky_up.svg`,
-
-        // Ghosts Common
         `${imgBase}characters/ghosts/eyes_down.svg`,
         `${imgBase}characters/ghosts/eyes_left.svg`,
         `${imgBase}characters/ghosts/eyes_right.svg`,
         `${imgBase}characters/ghosts/eyes_up.svg`,
         `${imgBase}characters/ghosts/scared_blue.svg`,
         `${imgBase}characters/ghosts/scared_white.svg`,
-
-        // Dots
         `${imgBase}pickups/pacdot.svg`,
         `${imgBase}pickups/powerPellet.svg`,
-
-        // Fruit
         `${imgBase}pickups/apple.svg`,
         `${imgBase}pickups/bell.svg`,
         `${imgBase}pickups/cherry.svg`,
@@ -268,11 +329,7 @@ class GameCoordinator {
         `${imgBase}pickups/melon.svg`,
         `${imgBase}pickups/orange.svg`,
         `${imgBase}pickups/strawberry.svg`,
-
-        // Text
         `${imgBase}text/ready.svg`,
-
-        // Points
         `${imgBase}text/100.svg`,
         `${imgBase}text/200.svg`,
         `${imgBase}text/300.svg`,
@@ -285,11 +342,7 @@ class GameCoordinator {
         `${imgBase}text/2000.svg`,
         `${imgBase}text/3000.svg`,
         `${imgBase}text/5000.svg`,
-
-        // Maze
         `${imgBase}maze/maze_blue.svg`,
-
-        // Misc
         'app/style/graphics/extra_life.png',
       ];
 
@@ -335,14 +388,6 @@ class GameCoordinator {
     });
   }
 
-  /**
-   * Iterates through a list of sources and updates the loading bar as the assets load in
-   * @param {String[]} sources
-   * @param {('img'|'audio')} type
-   * @param {Number} totalSources
-   * @param {Object} gameCoord
-   * @returns {Promise}
-   */
   createElements(sources, type, totalSources, gameCoord) {
     const loadingContainer = document.getElementById('loading-container');
     const preloadDiv = document.getElementById('preload-div');
@@ -389,9 +434,6 @@ class GameCoordinator {
     });
   }
 
-  /**
-   * Resets gameCoordinator values to their default states
-   */
   reset() {
     this.activeTimers = [];
     this.points = 0;
@@ -478,21 +520,18 @@ class GameCoordinator {
       this.soundManager = new SoundManager();
       this.setUiDimensions();
     } else {
+      this.setMazeByLevel(this.level);
+      this.updateCharacterMazes();
+      this.resetMazePickups();
       this.pacman.reset();
       this.ghosts.forEach((ghost) => {
         ghost.reset(true);
-      });
-      this.pickups.forEach((pickup) => {
-        if (pickup.type !== 'fruit') {
-          this.remainingDots += 1;
-          pickup.reset();
-          this.entityList.push(pickup);
-        }
       });
     }
 
     this.pointsDisplay.innerHTML = '00';
     this.highScoreDisplay.innerHTML = this.highScore || '00';
+    this.levelDisplay.innerText = 'Level: ' + this.level;
     this.clearDisplay(this.fruitDisplay);
 
     const volumePreference = parseInt(
@@ -503,9 +542,6 @@ class GameCoordinator {
     this.soundManager.setMasterVolume(volumePreference);
   }
 
-  /**
-   * Calls necessary setup functions to start the game
-   */
   init() {
     this.registerEventListeners();
 
@@ -513,11 +549,6 @@ class GameCoordinator {
     this.gameEngine.start();
   }
 
-  /**
-   * Adds HTML elements to draw on the webpage by iterating through the 2D maze array
-   * @param {Array} mazeArray - 2D array representing the game board
-   * @param {Array} entityList - List of entities to be used throughout the game
-   */
   drawMaze(mazeArray, entityList) {
     this.pickups = [this.fruit];
 
@@ -550,15 +581,28 @@ class GameCoordinator {
     });
   }
 
+
+  updateCharacterMazes() {
+    this.pacman.mazeArray = this.mazeArray;
+    this.ghosts.forEach((ghost) => {
+      ghost.mazeArray = this.mazeArray;
+    });
+  }
+
+  resetMazePickups() {
+    this.entityList = this.entityList.filter((entity) => (
+      !(entity instanceof Pickup) || entity.type === 'fruit'
+    ));
+    this.clearDisplay(this.dotContainer);
+    this.remainingDots = 0;
+    this.drawMaze(this.mazeArray, this.entityList);
+  }
+
   setUiDimensions() {
     this.gameUi.style.fontSize = `${this.scaledTileSize}px`;
     this.rowTop.style.marginBottom = `${this.scaledTileSize}px`;
   }
 
-  /**
-   * Loop which periodically checks which pickups are nearby Pacman.
-   * Pickups which are far away will not be considered for collision detection.
-   */
   collisionDetectionLoop() {
     if (this.pacman.position) {
       const maxDistance = this.pacman.velocityPerMs * 750;
@@ -567,7 +611,6 @@ class GameCoordinator {
         y: this.pacman.position.top + this.scaledTileSize,
       };
 
-      // Set this flag to TRUE to see how two-phase collision detection works!
       const debugging = false;
 
       this.pickups.forEach((pickup) => {
@@ -576,10 +619,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Displays "Ready!" and allows Pacman to move after a breif delay
-   * @param {Boolean} initialStart - Special condition for the game's beginning
-   */
   startGameplay(initialStart) {
     if (initialStart) {
       this.soundManager.play('game_start');
@@ -619,19 +658,16 @@ class GameCoordinator {
     }, duration);
   }
 
-  /**
-   * Clears out all children nodes from a given display element
-   * @param {String} display
-   */
   clearDisplay(display) {
+    if (!display) {
+      return;
+    }
+
     while (display.firstChild) {
       display.removeChild(display.firstChild);
     }
   }
 
-  /**
-   * Displays extra life images equal to the number of remaining lives
-   */
   updateExtraLivesDisplay() {
     this.clearDisplay(this.extraLivesDisplay);
 
@@ -643,10 +679,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Displays a rolling log of the seven most-recently eaten fruit
-   * @param {String} rawImageSource
-   */
   updateFruitDisplay(rawImageSource) {
     const parsedSource = rawImageSource.slice(
       rawImageSource.indexOf('(') + 1,
@@ -663,10 +695,6 @@ class GameCoordinator {
     this.fruitDisplay.appendChild(fruitPic);
   }
 
-  /**
-   * Cycles the ghosts between 'chase' and 'scatter' mode
-   * @param {('chase'|'scatter')} mode
-   */
   ghostCycle(mode) {
     const delay = mode === 'scatter' ? 7000 : 20000;
     const nextMode = mode === 'scatter' ? 'chase' : 'scatter';
@@ -680,9 +708,6 @@ class GameCoordinator {
     }, delay);
   }
 
-  /**
-   * Releases a ghost from the Ghost House after a delay
-   */
   releaseGhost() {
     if (this.idleGhosts.length > 0) {
       const delay = Math.max((8 - (this.level - 1) * 4) * 1000, 0);
@@ -694,9 +719,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Register listeners for various game sequences
-   */
   registerEventListeners() {
     window.addEventListener('keydown', this.handleKeyDown.bind(this));
     window.addEventListener('awardPoints', this.awardPoints.bind(this));
@@ -720,20 +742,12 @@ class GameCoordinator {
     });
   }
 
-  /**
-   * Calls Pacman's changeDirection event if certain conditions are met
-   * @param {({'up'|'down'|'left'|'right'})} direction
-   */
   changeDirection(direction) {
     if (this.allowKeyPresses && this.gameEngine.running) {
       this.pacman.changeDirection(direction, this.allowPacmanMovement);
     }
   }
 
-  /**
-   * Calls various class functions depending upon the pressed key
-   * @param {Event} e - The keydown event to evaluate
-   */
   handleKeyDown(e) {
     if (e.keyCode === 27) {
       // ESC key
@@ -746,9 +760,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Handle behavior for the pause key
-   */
   handlePauseKey() {
     if (this.allowPause) {
       this.allowPause = false;
@@ -785,10 +796,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Adds points to the player's total
-   * @param {({ detail: { points: Number }})} e - Contains a quantity of points to add
-   */
   awardPoints(e) {
     this.points += e.detail.points;
     this.pointsDisplay.innerText = this.points;
@@ -823,10 +830,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Animates Pacman's death, subtracts a life, and resets character positions if
-   * the player has remaining lives.
-   */
   deathSequence() {
     this.allowPause = false;
     this.cutscene = true;
@@ -875,9 +878,6 @@ class GameCoordinator {
     }, 750);
   }
 
-  /**
-   * Displays GAME OVER text and displays the menu so players can play again
-   */
   gameOver() {
     localStorage.setItem('highScore', this.highScore);
 
@@ -907,9 +907,6 @@ class GameCoordinator {
     }, 2250);
   }
 
-  /**
-   * Handle events related to the number of remaining dots
-   */
   dotEaten() {
     this.remainingDots -= 1;
 
@@ -928,9 +925,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Creates a bonus fruit for ten seconds
-   */
   createFruit() {
     this.removeTimer({ detail: { timer: this.fruitTimer } });
     this.fruit.showFruit(this.fruitPoints[this.level] || 5000);
@@ -939,9 +933,6 @@ class GameCoordinator {
     }, 10000);
   }
 
-  /**
-   * Speeds up Blinky and raises the background noise pitch
-   */
   speedUpBlinky() {
     this.blinky.speedUp();
 
@@ -950,11 +941,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Determines the correct siren ambience
-   * @param {Number} remainingDots
-   * @returns {String}
-   */
   determineSiren(remainingDots) {
     let sirenNum;
 
@@ -969,9 +955,6 @@ class GameCoordinator {
     return `siren_${sirenNum}`;
   }
 
-  /**
-   * Resets the gameboard and prepares the next level
-   */
   advanceLevel() {
     this.allowPause = false;
     this.cutscene = true;
@@ -1013,7 +996,11 @@ class GameCoordinator {
                   new Timer(() => {
                     this.mazeCover.style.visibility = 'hidden';
                     this.level += 1;
+                    this.setMazeByLevel(this.level);
+                    this.levelDisplay.innerText = 'Level: ' + this.level;
                     this.allowKeyPresses = true;
+                    this.updateCharacterMazes();
+                    this.resetMazePickups();
                     this.entityList.forEach((entity) => {
                       const entityRef = entity;
                       if (entityRef.level) {
@@ -1022,12 +1009,6 @@ class GameCoordinator {
                       entityRef.reset();
                       if (entityRef instanceof Ghost) {
                         entityRef.resetDefaultSpeed();
-                      }
-                      if (
-                        entityRef instanceof Pickup
-                        && entityRef.type !== 'fruit'
-                      ) {
-                        this.remainingDots += 1;
                       }
                     });
                     this.startGameplay();
@@ -1041,11 +1022,6 @@ class GameCoordinator {
     }, 2000);
   }
 
-  /**
-   * Flashes ghosts blue and white to indicate the end of the powerup
-   * @param {Number} flashes - Total number of elapsed flashes
-   * @param {Number} maxFlashes - Total flashes to show
-   */
   flashGhosts(flashes, maxFlashes) {
     if (flashes === maxFlashes) {
       this.scaredGhosts.forEach((ghost) => {
@@ -1066,9 +1042,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Upon eating a power pellet, sets the ghosts to 'scared' mode
-   */
   powerUp() {
     if (this.remainingDots !== 0) {
       this.soundManager.setAmbience('power_up');
@@ -1095,17 +1068,10 @@ class GameCoordinator {
     }, powerDuration);
   }
 
-  /**
-   * Determines the quantity of points to give based on the current combo
-   */
   determineComboPoints() {
     return 100 * (2 ** this.ghostCombo);
   }
 
-  /**
-   * Upon eating a ghost, award points and temporarily pause movement
-   * @param {CustomEvent} e - Contains a target ghost object
-   */
   eatGhost(e) {
     const pauseDuration = 1000;
     const { position, measurement } = e.detail.ghost;
@@ -1164,9 +1130,6 @@ class GameCoordinator {
     }, pauseDuration);
   }
 
-  /**
-   * Decrements the count of "eye" ghosts and updates the ambience
-   */
   restoreGhost() {
     this.eyeGhosts -= 1;
 
@@ -1178,14 +1141,6 @@ class GameCoordinator {
     }
   }
 
-  /**
-   * Creates a temporary div to display points on screen
-   * @param {({ left: number, top: number })} position - CSS coordinates to display the points at
-   * @param {Number} amount - Amount of points to display
-   * @param {Number} duration - Milliseconds to display the points before disappearing
-   * @param {Number} width - Image width in pixels
-   * @param {Number} height - Image height in pixels
-   */
   displayText(position, amount, duration, width, height) {
     const pointsDiv = document.createElement('div');
 
@@ -1206,47 +1161,26 @@ class GameCoordinator {
     }, duration);
   }
 
-  /**
-   * Pushes a Timer to the activeTimers array
-   * @param {({ detail: { timer: Object }})} e
-   */
   addTimer(e) {
     this.activeTimers.push(e.detail.timer);
   }
 
-  /**
-   * Checks if a Timer with a matching ID exists
-   * @param {({ detail: { timer: Object }})} e
-   * @returns {Boolean}
-   */
   timerExists(e) {
     return !!(e.detail.timer || {}).timerId;
   }
 
-  /**
-   * Pauses a timer
-   * @param {({ detail: { timer: Object }})} e
-   */
   pauseTimer(e) {
     if (this.timerExists(e)) {
       e.detail.timer.pause(true);
     }
   }
 
-  /**
-   * Resumes a timer
-   * @param {({ detail: { timer: Object }})} e
-   */
   resumeTimer(e) {
     if (this.timerExists(e)) {
       e.detail.timer.resume(true);
     }
   }
 
-  /**
-   * Removes a Timer from activeTimers
-   * @param {({ detail: { timer: Object }})} e
-   */
   removeTimer(e) {
     if (this.timerExists(e)) {
       window.clearTimeout(e.detail.timer.timerId);
