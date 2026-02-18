@@ -3,6 +3,7 @@ class GameCoordinator {
     this.gameUi = document.getElementById('game-ui');
     this.rowTop = document.getElementById('row-top');
     this.mazeDiv = document.getElementById('maze');
+    this.mazeImg = document.getElementById('maze-img');
     this.mazeCover = document.getElementById('maze-cover');
     this.pointsDisplay = document.getElementById('points-display');
     this.highScoreDisplay = document.getElementById('high-score-display');
@@ -18,29 +19,39 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // --- FIX 1: REMOVE STATIC IMAGE COMPLETELY ---
-    const oldImg = document.getElementById('maze-img');
-    if (oldImg) { oldImg.remove(); }
+    // --- FIX 1: Prevent Crash by keeping mazeImg but hiding it ---
+    // We cannot remove() it because other scripts need it to exist.
+    this.mazeImg.style.opacity = '0'; 
+    this.mazeImg.style.zIndex = '0';
 
-    // --- FIX 2: CREATE DYNAMIC CANVAS ---
+    // --- FIX 2: Create Dynamic Canvas for Walls ---
+    // Check if canvas already exists to prevent duplicates on reload
+    let existingCanvas = document.getElementById('maze-canvas');
+    if (existingCanvas) existingCanvas.remove();
+
     this.mazeCanvas = document.createElement('canvas');
     this.mazeCanvas.id = 'maze-canvas';
     this.mazeCanvas.style.position = 'absolute';
     this.mazeCanvas.style.top = '0';
     this.mazeCanvas.style.left = '0';
-    this.mazeCanvas.style.zIndex = '1'; // Floor level
+    this.mazeCanvas.style.zIndex = '1'; // Above the hidden image
     this.mazeDiv.appendChild(this.mazeCanvas);
 
-    // Ensure Dot Container is ABOVE walls
+    // --- FIX 3: Ensure Dots are Top-Most ---
     this.dotContainer = document.getElementById('dot-container');
     if (!this.dotContainer) {
         this.dotContainer = document.createElement('div');
         this.dotContainer.id = 'dot-container';
         this.mazeDiv.appendChild(this.dotContainer);
     }
-    this.dotContainer.style.zIndex = '10'; // Dots above walls
+    this.dotContainer.style.zIndex = '10'; // Explicitly above canvas
+    this.dotContainer.style.position = 'absolute';
+    this.dotContainer.style.top = '0';
+    this.dotContainer.style.left = '0';
+    this.dotContainer.style.width = '100%';
+    this.dotContainer.style.height = '100%';
 
-    // MAP 1: The Classic (Blue Walls)
+    // LEVEL 1: Classic
     const map1 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -75,14 +86,14 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // MAP 2: The Grid (Red Walls, More Open)
+    // LEVEL 2: The Grid (Walls Changed)
     const map2 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
       'XOXXXXoXXXXXoXXoXXXXXoXXXXOX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
-      'Xoooooooooooo  ooooooooooooX', // Open Middle
+      'Xoooooooooooo  ooooooooooooX', // Opened up
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XooooooXXooooXXooooXXooooooX',
@@ -110,7 +121,7 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // MAP 3: The Cross (Green Walls, Verticality)
+    // LEVEL 3: The Cross
     const map3 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -152,7 +163,6 @@ class GameCoordinator {
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
 
-    // Default to Map 1
     this.mazeArray = this.layouts[0].map(row => row.split(''));
 
     this.movementKeys = { 87: 'up', 83: 'down', 65: 'left', 68: 'right', 38: 'up', 40: 'down', 37: 'left', 39: 'right' };
@@ -169,7 +179,7 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // --- FIX 3: HUD Text Positioning (Right Aligned) ---
+    // FIX: HUD Right Alignment
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
@@ -206,12 +216,11 @@ class GameCoordinator {
     this.mazeArray = this.layouts[layoutIndex].map(row => row.split(''));
   }
 
-  // --- DRAWING LOGIC (Dynamic Walls) ---
   drawMazeBackground(level) {
     const layoutIndex = (level - 1) % this.layouts.length;
-    let wallColor = '#1919A6'; // Default Blue
-    if (layoutIndex === 1) wallColor = '#A61919'; // Red for Map 2
-    if (layoutIndex === 2) wallColor = '#19A619'; // Green for Map 3
+    let wallColor = '#1919A6'; // Blue
+    if (layoutIndex === 1) wallColor = '#A61919'; // Red
+    if (layoutIndex === 2) wallColor = '#19A619'; // Green
 
     this.mazeCanvas.width = this.scaledTileSize * 28;
     this.mazeCanvas.height = this.scaledTileSize * 31;
@@ -224,7 +233,6 @@ class GameCoordinator {
         row.forEach((val, x) => {
             if (val === 'X') {
                 ctx.fillRect(x * this.scaledTileSize, y * this.scaledTileSize, this.scaledTileSize, this.scaledTileSize);
-                // Hollow effect
                 ctx.fillStyle = '#000';
                 ctx.fillRect(x * this.scaledTileSize + 2, y * this.scaledTileSize + 2, this.scaledTileSize - 4, this.scaledTileSize - 4);
                 ctx.fillStyle = wallColor;
@@ -290,7 +298,7 @@ class GameCoordinator {
         `${imgBase}pickups/pacdot.svg`, `${imgBase}pickups/powerPellet.svg`,
         `${imgBase}pickups/apple.svg`, `${imgBase}pickups/bell.svg`, `${imgBase}pickups/cherry.svg`, `${imgBase}pickups/galaxian.svg`, `${imgBase}pickups/key.svg`, `${imgBase}pickups/melon.svg`, `${imgBase}pickups/orange.svg`, `${imgBase}pickups/strawberry.svg`,
         `${imgBase}text/ready.svg`, `${imgBase}text/100.svg`, `${imgBase}text/200.svg`, `${imgBase}text/300.svg`, `${imgBase}text/400.svg`, `${imgBase}text/500.svg`, `${imgBase}text/700.svg`, `${imgBase}text/800.svg`, `${imgBase}text/1000.svg`, `${imgBase}text/1600.svg`, `${imgBase}text/2000.svg`, `${imgBase}text/3000.svg`, `${imgBase}text/5000.svg`,
-        'app/style/graphics/extra_life.png',
+        `${imgBase}maze/maze_blue.svg`, 'app/style/graphics/extra_life.png',
       ];
       const audioBase = 'app/style/audio/';
       const audioSources = [`${audioBase}game_start.mp3`, `${audioBase}pause.mp3`, `${audioBase}pause_beat.mp3`, `${audioBase}siren_1.mp3`, `${audioBase}siren_2.mp3`, `${audioBase}siren_3.mp3`, `${audioBase}power_up.mp3`, `${audioBase}extra_life.mp3`, `${audioBase}eyes.mp3`, `${audioBase}eat_ghost.mp3`, `${audioBase}death.mp3`, `${audioBase}fruit.mp3`, `${audioBase}dot_1.mp3`, `${audioBase}dot_2.mp3`];
@@ -367,7 +375,6 @@ class GameCoordinator {
     this.scaredGhosts = [];
     this.eyeGhosts = 0;
 
-    // Determine current level map
     this.setMazeByLevel(this.level);
 
     if (this.firstGame) {
@@ -399,17 +406,20 @@ class GameCoordinator {
   }
 
   drawMaze(mazeArray, entityList) {
-    this.pickups = [this.fruit]; // Reset pickups list
+    this.pickups = [this.fruit];
     this.mazeDiv.style.height = `${this.scaledTileSize * 31}px`;
     this.mazeDiv.style.width = `${this.scaledTileSize * 28}px`;
     this.gameUi.style.width = `${this.scaledTileSize * 28}px`;
     this.bottomRow.style.minHeight = `${this.scaledTileSize * 2}px`;
     
-    // Ensure container exists and is on top
+    // Ensure Dot Container Exists and is ABOVE canvas
     this.dotContainer = document.getElementById('dot-container');
-    if (this.dotContainer) {
-        this.dotContainer.style.zIndex = '10';
+    if (!this.dotContainer) {
+        this.dotContainer = document.createElement('div');
+        this.dotContainer.id = 'dot-container';
+        this.mazeDiv.appendChild(this.dotContainer);
     }
+    this.dotContainer.style.zIndex = '10';
 
     mazeArray.forEach((row, rowIndex) => {
       row.forEach((block, columnIndex) => {
@@ -649,22 +659,24 @@ class GameCoordinator {
     this.removeTimer({ detail: { timer: this.fruitTimer } }); this.removeTimer({ detail: { timer: this.ghostCycleTimer } });
     this.removeTimer({ detail: { timer: this.endIdleTimer } }); this.removeTimer({ detail: { timer: this.ghostFlashTimer } });
     
+    // Win Animation
     new Timer(() => {
       this.ghosts.forEach((ghost) => { const ghostRef = ghost; ghostRef.display = false; });
-      // Blink Effect (Using canvas clear)
+      // Blink Effect (Using canvas clear instead of svg swap)
       const blink = (count) => {
         if (count > 5) {
             this.mazeCover.style.visibility = 'visible';
             new Timer(() => {
                 this.mazeCover.style.visibility = 'hidden';
                 this.level += 1;
-                // UPDATE MAP
+                // UPDATE MAP LOGIC
                 this.setMazeByLevel(this.level);
+                // UPDATE HUD
                 this.levelDisplay.innerText = 'Level: ' + this.level;
                 this.allowKeyPresses = true;
                 this.updateCharacterMazes();
                 this.resetMazePickups();
-                // REDRAW WALLS (Pass Level for color change)
+                // REDRAW WALLS FOR NEW LEVEL
                 this.drawMazeBackground(this.level);
                 this.entityList.forEach((entity) => {
                     const entityRef = entity;
