@@ -1129,8 +1129,7 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // The visual walls are static images, so we must keep the 'X' positions identical.
-    // We create variety by changing the Power Pellets ('O') locations.
+    // Base layout matching the static background image
     this.baseLayout = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -1165,20 +1164,20 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // Coordinates for Power Pellets [x, y] for each level variation
+    // Power Pellet coordinates [x, y] for different levels
     this.pelletVariations = [
       // Map 1: Classic Corners
       [[1, 3], [26, 3], [1, 23], [26, 23]],
-      // Map 2: Inner Corridors (Harder access)
+      // Map 2: Inner Corridors
       [[6, 3], [21, 3], [6, 23], [21, 23]],
-      // Map 3: Cross Pattern (High risk)
+      // Map 3: Cross Pattern
       [[1, 6], [26, 6], [9, 23], [18, 23]]
     ];
 
     this.maxFps = 120;
     this.tileSize = 8;
     
-    // Initialize
+    // Initialize Map 1
     this.mazeArray = this.generateMap(0);
     this.scale = this.determineScale(1);
     this.scaledTileSize = this.tileSize * this.scale;
@@ -1198,15 +1197,15 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // Setup Level Display - RIGHT ALIGNED FIX
+    // Setup Level Display (Right Aligned)
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
     this.levelDisplay.style.color = '#fff';
     this.levelDisplay.style.position = 'absolute';
     this.levelDisplay.style.bottom = '0';
-    this.levelDisplay.style.right = '0'; // Snaps to right
-    this.levelDisplay.style.left = 'auto'; // Prevents left snapping
+    this.levelDisplay.style.right = '0'; // Right align
+    this.levelDisplay.style.left = 'auto'; // Disable left
     this.levelDisplay.style.textAlign = 'right';
     this.levelDisplay.style.lineHeight = `${this.scaledTileSize * 2}px`;
     this.levelDisplay.style.fontSize = `${this.scaledTileSize}px`;
@@ -1215,15 +1214,14 @@ class GameCoordinator {
     this.bottomRow.appendChild(this.levelDisplay);
   }
 
-  // Helper to merge base walls with unique pellet locations
   generateMap(index) {
     const variationIndex = index % this.pelletVariations.length;
     // Deep copy base layout
     const map = this.baseLayout.map(row => row.split(''));
-    // Apply pellets
+    // Place Power Pellets
     this.pelletVariations[variationIndex].forEach(([x, y]) => {
       if (map[y] && map[y][x] === 'o') {
-        map[y][x] = 'O'; // Turn dot into Power Pellet
+        map[y][x] = 'O';
       }
     });
     return map;
@@ -1382,7 +1380,7 @@ class GameCoordinator {
       this.soundManager = new SoundManager();
       this.setUiDimensions();
     } else {
-      this.mazeArray = this.generateMap(this.level - 1); // Fix map load
+      this.mazeArray = this.generateMap(this.level - 1);
       this.updateCharacterMazes();
       this.resetMazePickups();
       this.pacman.reset();
@@ -1668,6 +1666,7 @@ class GameCoordinator {
                   new Timer(() => {
                     this.mazeCover.style.visibility = 'hidden';
                     this.level += 1;
+                    // FIX: Call correct method
                     this.mazeArray = this.generateMap(this.level - 1);
                     this.levelDisplay.innerText = 'Level: ' + this.level;
                     this.allowKeyPresses = true;
