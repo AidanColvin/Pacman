@@ -1,11 +1,11 @@
 const gulp = require('gulp');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const concat = require('gulp-concat');
 const removeCode = require('gulp-remove-code');
 
 function styles() {
   return gulp.src('app/style/scss/**/*.scss')
-    .pipe(sass())
+    .pipe(sass().on('error', sass.logError))
     .pipe(concat('app.css'))
     .pipe(gulp.dest('build'));
 }
