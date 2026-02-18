@@ -19,12 +19,24 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // Base layout matching the static background image
-    this.baseLayout = [
+    // Hide static image, we will draw dynamic walls
+    this.mazeImg.style.display = 'none';
+    
+    // Create Canvas for Dynamic Walls
+    this.mazeCanvas = document.createElement('canvas');
+    this.mazeCanvas.id = 'maze-canvas';
+    this.mazeCanvas.style.position = 'absolute';
+    this.mazeCanvas.style.top = '0';
+    this.mazeCanvas.style.left = '0';
+    this.mazeCanvas.style.zIndex = '0'; // Behind dots
+    this.mazeDiv.appendChild(this.mazeCanvas);
+
+    // LEVEL 1: The Classic
+    const map1 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
-      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOXXXXoXXXXXoXXoXXXXXoXXXXOx',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
       'XooooooooooooooooooooooooooX',
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
@@ -44,7 +56,7 @@ class GameCoordinator {
       'XooooooooooooXXooooooooooooX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
-      'XoooXXooooooo  oooooooXXoooX',
+      'XOooXXooooooo  oooooooXXooOx',
       'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
       'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
       'XooooooXXooooXXooooXXooooooX',
@@ -54,24 +66,85 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // Power Pellet coordinates [x, y] for different levels
-    this.pelletVariations = [
-      // Map 1: Classic Corners
-      [[1, 3], [26, 3], [1, 23], [26, 23]],
-      // Map 2: Inner Corridors
-      [[6, 3], [21, 3], [6, 23], [21, 23]],
-      // Map 3: Cross Pattern
-      [[1, 6], [26, 6], [9, 23], [18, 23]]
+    // LEVEL 2: The Grid (More open, different barriers)
+    const map2 = [
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOXXXXoXXXXXoXXoXXXXXoXXXXOX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'Xoooooooooooo  ooooooooooooX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      '      o   X      X   o      ',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooXXooooooo  oooooooXXooOX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
+    // LEVEL 3: The Cross (Very different layout)
+    const map3 = [
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOXXXXoXXXXXoXXoXXXXXoXXXXOX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
+      'XooooooXXooooXXooooXXooooooX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXXXXX XX XXXXXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      '      o   X      X   o      ',
+      'XXXXXXoXX X      X XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX          XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XXXXXXoXX XXXXXXXX XXoXXXXXX',
+      'XooooooooooooXXooooooooooooX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
+      'XOooXXooooooo  oooooooXXooOX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XXXoXXoXXoXXXXXXXXoXXoXXoXXX',
+      'XOoooooXXooooXXooooXXoooooOX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XoXXXXXXXXXXoXXoXXXXXXXXXXoX',
+      'XooooooooooooooooooooooooooX',
+      'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    ];
+
+    this.layouts = [map1, map2, map3];
     this.maxFps = 120;
     this.tileSize = 8;
-    
-    // Initialize Map 1
-    this.mazeArray = this.generateMap(0);
     this.scale = this.determineScale(1);
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
+
+    // Initialize Map 1
+    this.mazeArray = this.layouts[0].map(row => row.split(''));
 
     this.movementKeys = { 87: 'up', 83: 'down', 65: 'left', 68: 'right', 38: 'up', 40: 'down', 37: 'left', 39: 'right' };
     this.fruitPoints = { 1: 100, 2: 300, 3: 500, 4: 700, 5: 1000, 6: 2000, 7: 3000, 8: 5000 };
@@ -87,34 +160,22 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // Setup Level Display (Right Aligned)
+    // LEVEL DISPLAY SETUP (RIGHT ALIGNED)
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
     this.levelDisplay.style.color = '#fff';
     this.levelDisplay.style.position = 'absolute';
     this.levelDisplay.style.bottom = '0';
-    this.levelDisplay.style.right = '0'; // Right align
-    this.levelDisplay.style.left = 'auto'; // Disable left
+    this.levelDisplay.style.right = '0'; // Snap to right
+    this.levelDisplay.style.left = 'auto'; // Release left
     this.levelDisplay.style.textAlign = 'right';
     this.levelDisplay.style.lineHeight = `${this.scaledTileSize * 2}px`;
     this.levelDisplay.style.fontSize = `${this.scaledTileSize}px`;
+    this.levelDisplay.style.marginRight = '5px'; // Small padding
     this.levelDisplay.style.pointerEvents = 'none';
     this.bottomRow.style.position = 'relative';
     this.bottomRow.appendChild(this.levelDisplay);
-  }
-
-  generateMap(index) {
-    const variationIndex = index % this.pelletVariations.length;
-    // Deep copy base layout
-    const map = this.baseLayout.map(row => row.split(''));
-    // Place Power Pellets
-    this.pelletVariations[variationIndex].forEach(([x, y]) => {
-      if (map[y] && map[y][x] === 'o') {
-        map[y][x] = 'O';
-      }
-    });
-    return map;
   }
 
   determineScale(scale) {
@@ -129,6 +190,50 @@ class GameCoordinator {
       return this.determineScale(scale + 1);
     }
     return scale - 1;
+  }
+
+  setMazeByLevel(level) {
+    const layoutIndex = (level - 1) % this.layouts.length;
+    // Deep copy the selected layout so we can modify it (eat dots) without breaking the original
+    this.mazeArray = this.layouts[layoutIndex].map(row => row.split(''));
+  }
+
+  // Draw the blue walls onto the canvas
+  drawMazeBackground() {
+    this.mazeCanvas.width = this.scaledTileSize * 28;
+    this.mazeCanvas.height = this.scaledTileSize * 31;
+    const ctx = this.mazeCanvas.getContext('2d');
+    
+    // Clear
+    ctx.clearRect(0, 0, this.mazeCanvas.width, this.mazeCanvas.height);
+    
+    // Draw Blue Walls for every 'X'
+    ctx.fillStyle = '#1919A6'; // Wall Color
+    
+    this.mazeArray.forEach((row, y) => {
+        row.forEach((val, x) => {
+            if (val === 'X') {
+                // Draw a simple block for the wall
+                // To make it look a bit "retro", we can leave a small gap
+                ctx.fillRect(
+                    x * this.scaledTileSize, 
+                    y * this.scaledTileSize, 
+                    this.scaledTileSize, 
+                    this.scaledTileSize
+                );
+                
+                // Optional: Add inner black square to simulate "hollow" walls
+                ctx.fillStyle = '#000';
+                ctx.fillRect(
+                    x * this.scaledTileSize + 2, 
+                    y * this.scaledTileSize + 2, 
+                    this.scaledTileSize - 4, 
+                    this.scaledTileSize - 4
+                );
+                ctx.fillStyle = '#1919A6'; // Reset to blue
+            }
+        });
+    });
   }
 
   startButtonClick() {
@@ -266,13 +371,16 @@ class GameCoordinator {
     this.eyeGhosts = 0;
 
     if (this.firstGame) {
+      this.setMazeByLevel(this.level);
       this.drawMaze(this.mazeArray, this.entityList);
+      this.drawMazeBackground(); // DRAW THE WALLS
       this.soundManager = new SoundManager();
       this.setUiDimensions();
     } else {
-      this.mazeArray = this.generateMap(this.level - 1);
+      this.setMazeByLevel(this.level);
       this.updateCharacterMazes();
       this.resetMazePickups();
+      this.drawMazeBackground(); // UPDATE THE WALLS
       this.pacman.reset();
       this.ghosts.forEach((ghost) => { ghost.reset(true); });
     }
@@ -537,45 +645,40 @@ class GameCoordinator {
     this.entityList.forEach((entity) => { const entityRef = entity; entityRef.moving = false; });
     this.removeTimer({ detail: { timer: this.fruitTimer } }); this.removeTimer({ detail: { timer: this.ghostCycleTimer } });
     this.removeTimer({ detail: { timer: this.endIdleTimer } }); this.removeTimer({ detail: { timer: this.ghostFlashTimer } });
-    const imgBase = 'app/style//graphics/spriteSheets/maze/';
+    
+    // Win Animation
     new Timer(() => {
       this.ghosts.forEach((ghost) => { const ghostRef = ghost; ghostRef.display = false; });
-      this.mazeImg.src = `${imgBase}maze_white.svg`;
-      new Timer(() => {
-        this.mazeImg.src = `${imgBase}maze_blue.svg`;
-        new Timer(() => {
-          this.mazeImg.src = `${imgBase}maze_white.svg`;
-          new Timer(() => {
-            this.mazeImg.src = `${imgBase}maze_blue.svg`;
+      // Blink Effect (Using canvas clear instead of svg swap)
+      const blink = (count) => {
+        if (count > 5) {
+            this.mazeCover.style.visibility = 'visible';
             new Timer(() => {
-              this.mazeImg.src = `${imgBase}maze_white.svg`;
-              new Timer(() => {
-                this.mazeImg.src = `${imgBase}maze_blue.svg`;
-                new Timer(() => {
-                  this.mazeCover.style.visibility = 'visible';
-                  new Timer(() => {
-                    this.mazeCover.style.visibility = 'hidden';
-                    this.level += 1;
-                    // FIX: Call correct method
-                    this.mazeArray = this.generateMap(this.level - 1);
-                    this.levelDisplay.innerText = 'Level: ' + this.level;
-                    this.allowKeyPresses = true;
-                    this.updateCharacterMazes();
-                    this.resetMazePickups();
-                    this.entityList.forEach((entity) => {
-                      const entityRef = entity;
-                      if (entityRef.level) { entityRef.level = this.level; }
-                      entityRef.reset();
-                      if (entityRef instanceof Ghost) { entityRef.resetDefaultSpeed(); }
-                    });
-                    this.startGameplay();
-                  }, 500);
-                }, 250);
-              }, 250);
-            }, 250);
-          }, 250);
-        }, 250);
-      }, 250);
+                this.mazeCover.style.visibility = 'hidden';
+                this.level += 1;
+                // UPDATE MAP LOGIC
+                this.setMazeByLevel(this.level);
+                // UPDATE HUD
+                this.levelDisplay.innerText = 'Level: ' + this.level;
+                this.allowKeyPresses = true;
+                this.updateCharacterMazes();
+                this.resetMazePickups();
+                // REDRAW WALLS FOR NEW LEVEL
+                this.drawMazeBackground();
+                this.entityList.forEach((entity) => {
+                    const entityRef = entity;
+                    if (entityRef.level) { entityRef.level = this.level; }
+                    entityRef.reset();
+                    if (entityRef instanceof Ghost) { entityRef.resetDefaultSpeed(); }
+                });
+                this.startGameplay();
+            }, 500);
+            return;
+        }
+        this.mazeCanvas.style.opacity = (count % 2 === 0) ? '0.5' : '1';
+        new Timer(() => { blink(count + 1); }, 250);
+      };
+      blink(0);
     }, 2000);
   }
 
