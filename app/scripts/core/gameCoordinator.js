@@ -19,18 +19,17 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // RESTORE: Ensure the static background image is VISIBLE
+    // Restore Static Image (Essential for stability)
     if (this.mazeImg) {
         this.mazeImg.style.display = 'block';
         this.mazeImg.style.opacity = '1';
         this.mazeImg.style.zIndex = '0';
     }
-
-    // REMOVE: Delete the broken canvas if it exists
+    
+    // Remove any leftover canvas from previous attempts
     const canvas = document.getElementById('maze-canvas');
     if (canvas) canvas.remove();
 
-    // The Standard Map Layout (Must match the maze_blue.svg image)
     this.baseLayout = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -65,7 +64,6 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // Power Pellet Positions for Levels 1, 2, 3
     this.pelletVariations = [
       [[1, 3], [26, 3], [1, 23], [26, 23]], // Corners
       [[6, 3], [21, 3], [6, 23], [21, 23]], // Inner
@@ -74,8 +72,12 @@ class GameCoordinator {
 
     this.maxFps = 120;
     this.tileSize = 8;
+
+    // --- FIX: GENERATE MAP BEFORE CALCULATING SCALE ---
     this.mazeArray = this.generateMap(0);
     this.scale = this.determineScale(1);
+    // --------------------------------------------------
+
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
 
@@ -93,15 +95,15 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // FIX HUD: Position "Level" on the RIGHT
+    // HUD Text - Right Aligned
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
     this.levelDisplay.style.color = '#fff';
     this.levelDisplay.style.position = 'absolute';
     this.levelDisplay.style.bottom = '0';
-    this.levelDisplay.style.right = '0'; // Right align
-    this.levelDisplay.style.left = 'auto'; // Remove left align
+    this.levelDisplay.style.right = '0'; 
+    this.levelDisplay.style.left = 'auto';
     this.levelDisplay.style.textAlign = 'right';
     this.levelDisplay.style.lineHeight = `${this.scaledTileSize * 2}px`;
     this.levelDisplay.style.fontSize = `${this.scaledTileSize}px`;
@@ -302,15 +304,7 @@ class GameCoordinator {
     this.mazeDiv.style.width = `${this.scaledTileSize * 28}px`;
     this.gameUi.style.width = `${this.scaledTileSize * 28}px`;
     this.bottomRow.style.minHeight = `${this.scaledTileSize * 2}px`;
-    
-    // DOT CONTAINER FIX: Ensure it exists and has high Z-Index
     this.dotContainer = document.getElementById('dot-container');
-    if (!this.dotContainer) {
-        this.dotContainer = document.createElement('div');
-        this.dotContainer.id = 'dot-container';
-        this.mazeDiv.appendChild(this.dotContainer);
-    }
-    this.dotContainer.style.zIndex = '10';
 
     mazeArray.forEach((row, rowIndex) => {
       row.forEach((block, columnIndex) => {
