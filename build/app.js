@@ -1129,13 +1129,13 @@ class GameCoordinator {
     this.bottomRow = document.getElementById('bottom-row');
     this.movementButtons = document.getElementById('movement-buttons');
 
-    // --- FIX 1: Prevent Crash by keeping mazeImg but hiding it ---
-    // We cannot remove() it because other scripts need it to exist.
-    this.mazeImg.style.opacity = '0'; 
-    this.mazeImg.style.zIndex = '0';
+    // --- FIX 1: Safe Image Handling (Prevents Yellow Screen Crash) ---
+    // We keep the element but make it invisible so the code doesn't break
+    if (this.mazeImg) {
+        this.mazeImg.style.visibility = 'hidden'; 
+    }
 
-    // --- FIX 2: Create Dynamic Canvas for Walls ---
-    // Check if canvas already exists to prevent duplicates on reload
+    // --- FIX 2: Create Dynamic Wall Canvas ---
     let existingCanvas = document.getElementById('maze-canvas');
     if (existingCanvas) existingCanvas.remove();
 
@@ -1144,24 +1144,25 @@ class GameCoordinator {
     this.mazeCanvas.style.position = 'absolute';
     this.mazeCanvas.style.top = '0';
     this.mazeCanvas.style.left = '0';
-    this.mazeCanvas.style.zIndex = '1'; // Above the hidden image
+    this.mazeCanvas.style.zIndex = '1'; // Floor level
     this.mazeDiv.appendChild(this.mazeCanvas);
 
-    // --- FIX 3: Ensure Dots are Top-Most ---
+    // --- FIX 3: Ensure Dots are Clickable/Eatable ---
     this.dotContainer = document.getElementById('dot-container');
     if (!this.dotContainer) {
         this.dotContainer = document.createElement('div');
         this.dotContainer.id = 'dot-container';
         this.mazeDiv.appendChild(this.dotContainer);
     }
-    this.dotContainer.style.zIndex = '10'; // Explicitly above canvas
+    // Critical: Dots must be higher Z-Index than the Canvas (1)
+    this.dotContainer.style.zIndex = '10'; 
     this.dotContainer.style.position = 'absolute';
     this.dotContainer.style.top = '0';
     this.dotContainer.style.left = '0';
     this.dotContainer.style.width = '100%';
     this.dotContainer.style.height = '100%';
 
-    // LEVEL 1: Classic
+    // MAP 1: Classic
     const map1 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -1196,14 +1197,14 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // LEVEL 2: The Grid (Walls Changed)
+    // MAP 2: The Grid (Distinctly different)
     const map2 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
       'XOXXXXoXXXXXoXXoXXXXXoXXXXOX',
       'XoXXXXoXXXXXoXXoXXXXXoXXXXoX',
-      'Xoooooooooooo  ooooooooooooX', // Opened up
+      'Xoooooooooooo  ooooooooooooX',
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XoXXXXoXXoXXXXXXXXoXXoXXXXoX',
       'XooooooXXooooXXooooXXooooooX',
@@ -1231,7 +1232,7 @@ class GameCoordinator {
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
     ];
 
-    // LEVEL 3: The Cross
+    // MAP 3: The Cross
     const map3 = [
       'XXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'XooooooooooooXXooooooooooooX',
@@ -1273,6 +1274,7 @@ class GameCoordinator {
     this.scaledTileSize = this.tileSize * this.scale;
     this.firstGame = true;
 
+    // Load Map 1 initially
     this.mazeArray = this.layouts[0].map(row => row.split(''));
 
     this.movementKeys = { 87: 'up', 83: 'down', 65: 'left', 68: 'right', 38: 'up', 40: 'down', 37: 'left', 39: 'right' };
@@ -1289,7 +1291,7 @@ class GameCoordinator {
     link.onload = this.preloadAssets.bind(this);
     head.appendChild(link);
 
-    // FIX: HUD Right Alignment
+    // FIX HUD (Right Aligned)
     this.levelDisplay = document.createElement('div');
     this.levelDisplay.id = 'level-display';
     this.levelDisplay.style.fontFamily = '"Press Start 2P", cursive';
@@ -1326,11 +1328,14 @@ class GameCoordinator {
     this.mazeArray = this.layouts[layoutIndex].map(row => row.split(''));
   }
 
+  // --- DRAWING THE MAZE WALLS ---
   drawMazeBackground(level) {
     const layoutIndex = (level - 1) % this.layouts.length;
-    let wallColor = '#1919A6'; // Blue
-    if (layoutIndex === 1) wallColor = '#A61919'; // Red
-    if (layoutIndex === 2) wallColor = '#19A619'; // Green
+    
+    // VISUAL FEEDBACK: Change wall color per level
+    let wallColor = '#1919A6'; // Blue (Level 1)
+    if (layoutIndex === 1) wallColor = '#D02020'; // Red (Level 2)
+    if (layoutIndex === 2) wallColor = '#20D020'; // Green (Level 3)
 
     this.mazeCanvas.width = this.scaledTileSize * 28;
     this.mazeCanvas.height = this.scaledTileSize * 31;
@@ -1343,6 +1348,7 @@ class GameCoordinator {
         row.forEach((val, x) => {
             if (val === 'X') {
                 ctx.fillRect(x * this.scaledTileSize, y * this.scaledTileSize, this.scaledTileSize, this.scaledTileSize);
+                // Hollow Center
                 ctx.fillStyle = '#000';
                 ctx.fillRect(x * this.scaledTileSize + 2, y * this.scaledTileSize + 2, this.scaledTileSize - 4, this.scaledTileSize - 4);
                 ctx.fillStyle = wallColor;
@@ -1772,7 +1778,7 @@ class GameCoordinator {
     // Win Animation
     new Timer(() => {
       this.ghosts.forEach((ghost) => { const ghostRef = ghost; ghostRef.display = false; });
-      // Blink Effect (Using canvas clear instead of svg swap)
+      // Blink Effect (Using canvas clear)
       const blink = (count) => {
         if (count > 5) {
             this.mazeCover.style.visibility = 'visible';
